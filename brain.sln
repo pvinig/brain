@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pagamento", "pagamento", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pedido", "pedido", "{13A76273-5159-4633-BD51-B3529E62A661}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRN.carrinho", "src\services\BRN.carrinho\BRN.carrinho.csproj", "{CF8D0639-11EE-4A38-99F2-C759B9A09DBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRN.carrinho.API", "src\services\BRN.carrinho\BRN.carrinho.API.csproj", "{CF8D0639-11EE-4A38-99F2-C759B9A09DBC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BRN.catalogo.API", "src\services\BRN.catalogo.API\BRN.catalogo.API.csproj", "{97293331-ACF0-403A-9DAE-0E7F8319A6B9}"
 EndProject
