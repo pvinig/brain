@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +17,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore;
 using BRN.identidade.API.data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging.Configuration;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +31,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(optionsAction: options =>
@@ -35,18 +41,47 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(configureOptions: Options =>
+{
+    Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(JwtBearerOptions =>
+{
+    JwtBearerOptions.RequireHttpsMetadata = true;
+    JwtBearerOptions.SaveToken = true;
+    JwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(s:"x")),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = "x",
+        ValidIssuer = "x"
+    };
+});
+
+builder.Services.AddSwaggerGen(u =>
+{
+    u.SwaggerDoc(name: "v1", new OpenApiInfo
+    {
+        Title = "pinky e cerebro: brain",
+        Description = "servidorzinho REST distibuido ecomerce",
+        Contact = new OpenApiContact() { Name = "Vinicius Pretto", Email = "pvinig@gmail.com"}
+    });
+});
+// var appSetingsSection = Configuration.
+   // .GetSection(key: "AppSetings");
+
 // Configure the HTTP request pipeline. 
 
 
 var app = builder.Build();
 
-if(app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(u =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-
+    u.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+});
 
 app.UseDeveloperExceptionPage();
 

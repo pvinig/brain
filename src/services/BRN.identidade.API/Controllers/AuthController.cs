@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 namespace BRN.identidade.API.Controllers
 {
+    [ApiController]
     [Route("api/identidade")]
 
     public class AuthController : Controller
     {
+
+
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
 
