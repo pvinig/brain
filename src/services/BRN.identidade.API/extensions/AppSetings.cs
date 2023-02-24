@@ -1,13 +1,13 @@
 ﻿namespace BRN.identidade.API.extensions
 {
-    public class AppSetings
+    public class AppSettings
     {
         public string Secret { get; set; }
 
-        public int ExpiracaoHoras { get; set; }
+        public int ExpirateTime { get; set; }
 
-        public string Emissor { get; set; }
+        public string Issuer { get; set; }  // emissor
 
-        public string ValidoEm { get; set; }
+        public string Audience { get; set; } // valido em
     }
 }

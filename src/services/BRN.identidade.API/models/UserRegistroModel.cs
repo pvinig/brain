@@ -2,7 +2,7 @@
 
 namespace BRN.identidade.API.models
 {
-    public class UserViewRegistro
+    public class UserRegistroModel
     {
         [Required(ErrorMessage = "o campo {0} é obrigatório")]
         [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]

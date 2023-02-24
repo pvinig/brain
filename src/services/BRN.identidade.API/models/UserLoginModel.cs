@@ -2,7 +2,7 @@
 
 namespace BRN.identidade.API.models
 {
-    public class UserViewLogin
+    public class UserLoginModel
     {
         [Required(ErrorMessage = "field {0} is required")]
         [EmailAddress(ErrorMessage = "field {0} is in invalid format")]

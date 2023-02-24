@@ -16,20 +16,18 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore;
 using BRN.identidade.API.data;
+using BRN.identidade.API.extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Logging.Configuration;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 
@@ -40,6 +38,15 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+// JWT
+
+var appSettingsSection = builder.Configuration.GetSection(key: "AppSettings");
+builder.Services.Configure<AppSettings>(appSettingsSection);
+
+var appSetings = appSettingsSection.Get<AppSettings>();
+var key = Encoding.ASCII.GetBytes(appSetings.Secret);
+
 
 builder.Services.AddAuthentication(configureOptions: Options =>
 {
@@ -52,13 +59,18 @@ builder.Services.AddAuthentication(configureOptions: Options =>
     JwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(s:"x")),
+        IssuerSigningKey = new SymmetricSecurityKey(key),
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidAudience = "x",
-        ValidIssuer = "x"
+        ValidateLifetime = true,
+        ValidAudience = appSetings.Audience,
+        ValidIssuer = appSetings.Issuer
     };
 });
+
+
+
+// Swagger
 
 builder.Services.AddSwaggerGen(u =>
 {
@@ -69,11 +81,9 @@ builder.Services.AddSwaggerGen(u =>
         Contact = new OpenApiContact() { Name = "Vinicius Pretto", Email = "pvinig@gmail.com"}
     });
 });
-// var appSetingsSection = Configuration.
-   // .GetSection(key: "AppSetings");
 
-// Configure the HTTP request pipeline. 
 
+// HTTP req pipeline. 
 
 var app = builder.Build();
 
@@ -83,6 +93,7 @@ app.UseSwaggerUI(u =>
     u.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
 });
 
+
 app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
@@ -90,7 +101,6 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
-
 
 app.UseAuthorization();
 
