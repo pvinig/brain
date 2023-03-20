@@ -12,7 +12,7 @@ namespace BRN.identidade.API.models
         [Required(ErrorMessage = "o campo {0} é obrigatório")]
         [StringLength(100, ErrorMessage = "O campo {0} precisa ter entre {2} e {1} caracteres", MinimumLength = 6)]
 
-        public string Senha { get; set; }
+        public string Password { get; set; }
 
     }
 }

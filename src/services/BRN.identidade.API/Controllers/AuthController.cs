@@ -67,7 +67,7 @@ namespace BRN.identidade.API.Controllers
 
             var result = await _signInManager.PasswordSignInAsync(userName: 
                 userLogin.Email,
-                password: userLogin.Senha,
+                password: userLogin.Password,
                 isPersistent: false,
                 lockoutOnFailure: true  );
 
