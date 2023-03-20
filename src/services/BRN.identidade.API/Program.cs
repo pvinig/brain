@@ -21,93 +21,25 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-
-
+using BRN.Identidade.API.Extensions;
+using BRN.identidade.API.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile(path: "appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile(path: $"appsettings.{builder.Environment}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
-
-builder.Services.AddDbContext<ApplicationDbContext>(optionsAction: options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString(name: "DefaultConnection")));
-
-builder.Services.AddDefaultIdentity<IdentityUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// JWT
-
-var appSettingsSection = builder.Configuration.GetSection(key: "AppSettings");
-builder.Services.Configure<AppSettings>(appSettingsSection);
-
-var appSetings = appSettingsSection.Get<AppSettings>();
-var key = Encoding.ASCII.GetBytes(appSetings.Secret);
-
-
-builder.Services.AddAuthentication(configureOptions: Options =>
-{
-    Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(JwtBearerOptions =>
-{
-    JwtBearerOptions.RequireHttpsMetadata = true;
-    JwtBearerOptions.SaveToken = true;
-    JwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidAudience = appSetings.Audience,
-        ValidIssuer = appSetings.Issuer
-    };
-});
-
-
-
-// Swagger
-
-builder.Services.AddSwaggerGen(u =>
-{
-    u.SwaggerDoc(name: "v1", new OpenApiInfo
-    {
-        Title = "pinky e cerebro: brain",
-        Description = "servidorzinho REST distibuido ecomerce",
-        Contact = new OpenApiContact() { Name = "Vinicius Pretto", Email = "pvinig@gmail.com"}
-    });
-});
-
+builder.Services.AddIdentityConfiguration(builder.Configuration);
 
 // HTTP req pipeline. 
 
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI(u =>
-{
-    u.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
-});
 
-
-app.UseDeveloperExceptionPage();
-
-app.UseHttpsRedirection();
-
-app.UseRouting();
-
-app.UseAuthentication();
-
-app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
+app.UseApiConfiguration(builder.Environment);
 
 app.Run();

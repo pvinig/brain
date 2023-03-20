@@ -1,4 +1,4 @@
-﻿namespace BRN.identidade.API.models
+﻿namespace BRN.identidade.API.Jwt
 {
     public class UserRespostaLogin
     {
@@ -19,7 +19,7 @@
     }
 
     public class UserClaim
-     {
+    {
         public string Value { get; set; }
 
         public string Type { get; set; }
