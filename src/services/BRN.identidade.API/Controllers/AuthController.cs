@@ -79,6 +79,7 @@ namespace BRN.identidade.API.Controllers
                 new {
                         access_token = await jwtBuilder.GenerateAccessToken(),
                         refresh_token = await jwtBuilder.GenerateRefreshToken()
+
                      });
             }       
 

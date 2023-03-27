@@ -5,9 +5,9 @@ namespace BRN.WebApp.MVC.Services
 {
     public interface IAuthenticationService
     {
-        Task<string> Login(UserLogin userLogin);
+        Task<UserLoginResponse> Login(UserLogin userLogin);
 
-        Task<string> Register(UserRegister userRegister);
+        Task<UserLoginResponse> Register(UserRegister userRegister);
 
     }
 }

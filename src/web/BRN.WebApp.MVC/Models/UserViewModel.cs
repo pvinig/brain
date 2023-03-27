@@ -30,6 +30,6 @@ namespace BRN.WebApp.MVC.Models
         [StringLength(100, ErrorMessage = "field {0} need be between {2} and {1} characters", MinimumLength = 6)]
 
         public string Password { get; set; }
-
     }
+
 }

@@ -15,7 +15,7 @@ namespace BRN.WebApp.MVC.Services
             _httpClient = httpClient;
         }
 
-        public async Task<string> Login(UserLogin userLogin)
+        public async Task<UserLoginResponse> Login(UserLogin userLogin)
         {
             var loginContent = new StringContent(
                 JsonSerializer.Serialize(userLogin),  
@@ -25,14 +25,15 @@ namespace BRN.WebApp.MVC.Services
 
             var response = await _httpClient.PostAsync(requestUri:"https://localhost:44382/api/identidade/autenticar", loginContent);
 
-            var test = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
 
-            var deserialize = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
-            return deserialize;
-            // throw new NotImplementedException();
+            return JsonSerializer.Deserialize<UserLoginResponse>(await response.Content.ReadAsStringAsync(), options);
         }
 
-        public async Task<string> Register(UserRegister userRegister)
+        public async Task<UserLoginResponse> Register(UserRegister userRegister)
         {
             var registroContent = new StringContent(
                 JsonSerializer.Serialize(userRegister),
@@ -42,7 +43,13 @@ namespace BRN.WebApp.MVC.Services
 
             var response = await _httpClient.PostAsync(requestUri: "https://localhost:44382/api/identidade/nova-conta", registroContent);
 
-            return JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync());
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+
+            return JsonSerializer.Deserialize<UserLoginResponse>(await response.Content.ReadAsStringAsync(), options);
         }
 
 
