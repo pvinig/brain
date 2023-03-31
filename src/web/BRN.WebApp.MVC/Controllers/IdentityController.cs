@@ -1,11 +1,15 @@
 ﻿using BRN.WebApp.MVC.Models;
-using BRN.WebApp.MVC.Services;
+using System.Linq;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using IAuthenticationService = BRN.WebApp.MVC.Services.IAuthenticationService;
 
 namespace BRN.WebApp.MVC.Controllers
 {
-    public class identityController : Controller
+    public class identityController : MainController
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -24,11 +28,11 @@ namespace BRN.WebApp.MVC.Controllers
         public async Task<IActionResult> Register(UserRegister userRegister)
         {
             if (!ModelState.IsValid) return View(userRegister);
-
             var response = await _authenticationService.Register(userRegister);
 
+            if(ErrorsInResponse(response.ResponseResult)) return View(userRegister);
 
-            if (false) return View(userRegister);
+            await RealizeLogin(response);
 
             return RedirectToAction("index",controllerName: "home");
 
@@ -45,12 +49,39 @@ namespace BRN.WebApp.MVC.Controllers
         {
             if (!ModelState.IsValid) return View(userLogin);
 
-            var response = await _authenticationService.Login(userLogin);
+            var response  = await _authenticationService.Login(userLogin);
 
-            if (false) return View(userLogin);
+            if (ErrorsInResponse(response.ResponseResult)) return View(userLogin);
+
+            await RealizeLogin(response);
 
             return RedirectToAction("index", controllerName: "home");
 
+        }
+
+        private async Task RealizeLogin(UserLoginResponse response)
+        {
+            var token = takeToken(response.access_token);
+
+            var claims = new List<Claim>(); 
+            claims.Add(new Claim(type: "JWT", value: response.access_token));
+            claims.AddRange(token.Claims);
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authPropeerties = new AuthenticationProperties
+            {
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(60),
+                IsPersistent = true,    
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authPropeerties );
+        }
+        private static JwtSecurityToken takeToken(string jwtToken)
+        {
+            return new JwtSecurityTokenHandler().ReadJwtToken(jwtToken) as JwtSecurityToken;
         }
 
         [HttpGet("logout")]

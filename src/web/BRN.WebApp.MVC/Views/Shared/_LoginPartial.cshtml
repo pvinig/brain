@@ -1,10 +1,11 @@
-﻿@using BRN.WebApp.MVC
+﻿@using BRN.WebApp.MVC.Extensions
+@inject IUser AppUser
 
 <ul class="navbar-nav">
-    @if (Context.User.Identity.IsAuthenticated)
+    @if (AppUser.IsLoggedIn())
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" title="Manage">Olá</a>
+            <a class="nav-link text-dark" title="Manage">Olá  @AppUser.GetUserEmail()</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" asp-controller="Identity" asp-action="Logout">Sair</a>

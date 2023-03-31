@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BRN.WebApp.MVC.Services
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : Service, IAuthenticationService
     {
         private readonly HttpClient _httpClient;
 
@@ -30,6 +30,15 @@ namespace BRN.WebApp.MVC.Services
                 PropertyNameCaseInsensitive = true
             };
 
+            if (!HandleError(response))
+            {
+                return new UserLoginResponse
+                {
+                    ResponseResult = JsonSerializer.Deserialize<ResponseResult>(await response.Content.ReadAsStringAsync(), options)
+
+                };
+            }
+
             return JsonSerializer.Deserialize<UserLoginResponse>(await response.Content.ReadAsStringAsync(), options);
         }
 
@@ -48,6 +57,14 @@ namespace BRN.WebApp.MVC.Services
                 PropertyNameCaseInsensitive = true
             };
 
+            if (!HandleError(response))
+            {
+                return new UserLoginResponse
+                {
+                    ResponseResult = JsonSerializer.Deserialize<ResponseResult>(await response.Content.ReadAsStringAsync(), options)
+
+                };
+            }
 
             return JsonSerializer.Deserialize<UserLoginResponse>(await response.Content.ReadAsStringAsync(), options);
         }
